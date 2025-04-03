@@ -1,7 +1,6 @@
 from fastapi import FastAPI
+from app.routes.setup import setup_routes
 
 app = FastAPI()
 
-@app.get("/")
-async def get_app():
-    return {"message": "FastAPI running"}
+setup_routes(app)
