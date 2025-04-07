@@ -5,6 +5,7 @@ from app.core.security import LoginData
 from app.core.security import authenticate_user
 
 def setup_routes(app):
+    """Setup all routes for aplication."""
     @app.get("/")
     async def get_app():
         return {"message": "FastAPI running"}
