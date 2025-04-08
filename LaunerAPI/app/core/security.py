@@ -1,9 +1,9 @@
 import hashlib
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
 from fastapi import HTTPException, status
 from app.models.protheus import SysUsr
+
 
 class LoginData(BaseModel):
     username: str
@@ -24,5 +24,6 @@ def authenticate_user(db: Session, username: str, password: str):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=info,
             headers={"WWW-Authenticate": "Bearer"},            
-        )
+        )  
     
+    return username
