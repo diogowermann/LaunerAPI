@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from app.database import get_protheus_db
-from app.core.security import LoginData, authenticate_user
+from app.core.security import LoginData, authenticate_user, get_current_user
 from fastapi.middleware.cors import CORSMiddleware
 
 router = APIRouter()
@@ -16,6 +16,11 @@ async def get_app():
 async def login(login_data: LoginData, db: Session = Depends(get_protheus_db)):
     user = authenticate_user(db, login_data.username, login_data.password)    
     return user
+
+# Example protected route, use as template for future routes
+@router.get("/protected-route")
+async def protected_route(current_user: str = Depends(get_current_user)):
+    return {"message": f"Hello, {current_user}!"}
 
 def setup_middleware(app):
     app.add_middleware(

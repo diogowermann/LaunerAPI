@@ -13,12 +13,10 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await api.post('/login', { username, password });
-      localStorage.setItem('accessToken', response.data.access_token);
-
-      // Redirect to the dashboard
+      const expiresAt = new Date().getTime() + 30 * 60 * 1000; // 30 minutes in milliseconds
+      localStorage.setItem('access_token', response.data.access_token);
+      localStorage.setItem('expires_at', expiresAt);
       navigate('/dashboard');
-
-      console.log('Login successful:', response.data);
     } catch (err) {
       console.error('Login error:', err);
       setError('Credenciais inválidas. Tente novamente.');

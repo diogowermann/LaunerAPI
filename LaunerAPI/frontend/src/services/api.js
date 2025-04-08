@@ -7,14 +7,22 @@ const api = axios.create({
     }
 });
 
-api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('access_token');
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`;
-        }
-        return config;
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('access_token');
+    const expiresAt = localStorage.getItem('expires_at');
+    const isExpired = new Date().getTime() > parseInt(expiresAt, 10);
+
+    if (isExpired) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('expires_at');
+        window.location.href = '/'; // Redirect to login page
+        return Promise.reject('Tempo excedido');
     }
-);
+
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
 
 export default api;
