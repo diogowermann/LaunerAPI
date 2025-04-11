@@ -25,7 +25,7 @@ def setup_logging():
         credentials=("email", "pass"),  # Replace with your email credentials
         secure=()
     )
-    smtp_handler.setLevel(logging.ERROR)  # Only send emails for errors
+    smtp_handler.setLevel(logging.WARNING)  # Send emails for warnings and above
     smtp_handler.setFormatter(log_formatter)
 
     # Root logger
