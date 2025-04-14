@@ -1,8 +1,13 @@
+"""
+Logging setup file and e-mail sending based on log level.
+"""
+
 import logging
 from logging.handlers import RotatingFileHandler, SMTPHandler
 
 # Configure logging
 def setup_logging():
+    """Sets up the logging logic for the specific file."""
     log_formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
