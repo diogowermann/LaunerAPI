@@ -1,3 +1,8 @@
+"""
+Configures the security for the application.
+Uses JWT and hashing algorithm for passwords.
+"""
+
 import hashlib
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -6,6 +11,9 @@ from app.models.protheus import SysUsr
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer
+import logging
+
+logger = logging.getLogger(__name__)
 
 SECRET_KEY = "your-secret-key"  # Replace with a secure key in production
 ALGORITHM = "HS256"
@@ -15,11 +23,19 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 
 def create_access_token(data: dict):
     """Create a JWT token with expiration."""
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    try:
+        to_encode = data.copy()
+        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        logger.info(f"==LOGIN== Token gerado: {encoded_jwt}")
+        return encoded_jwt
+    except Exception as e:
+        logger.error(f"==LOGIN== Erro ao gerar token: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro ao gerar token",
+        )
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     """Get the current user from the token."""
@@ -47,14 +63,15 @@ def hash_password(password: str) -> str:
 
 def authenticate_user(db: Session, username: str, password: str):
     """Verify user credentials."""
+    
     password = hash_password(password)
     user = db.query(SysUsr).filter(SysUsr.api_usr_codigo == username, SysUsr.api_usr_pwd == password).first()
 
     if not user:
-        info = f"Credenciais Inválidas:\ndb: {db}, username: {username}, password: {password}"
+        logger.error(f"==LOGIN== Falha na autenticacao com usuario: {username}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=info,
+            detail= f"Credenciais Inválidas",
             headers={"WWW-Authenticate": "Bearer"},            
         )  
     
