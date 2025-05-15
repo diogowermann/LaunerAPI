@@ -8,8 +8,10 @@ from sqlalchemy.orm import Session
 from app.database import get_protheus_db
 from app.core.security import LoginData, authenticate_user, get_current_user
 from fastapi.middleware.cors import CORSMiddleware
-from app.services.cpu_usage import get_cpu_usage as real_time_cpu_usage
-from app.services.memory_usage import get_memory_usage as real_time_memory_usage
+from app.services.current_usages import return_all
+from app.services.merge_total_data import return_data as total_data
+from app.services.cpu.get_per_process_usage import return_data as last_minutes_cpu_per_process_data
+from app.services.memory.get_per_process_usage import return_data as last_minutes_mem_per_process_data
 import logging
 
 router = APIRouter()
@@ -35,17 +37,19 @@ async def login(login_data: LoginData, db: Session = Depends(get_protheus_db)):
 async def protected_route(current_user: str = Depends(get_current_user)):
     return {"message": f"Hello, {current_user}!"}
 
-@router.get("/cpu-usage")
-async def get_cpu_usage(db: Session = Depends(get_protheus_db)):
-    """Collects CPU usage. Return usage values in real time and store hourly, daily and 
-    weekly values in the database."""
-    return real_time_cpu_usage(db)
+@router.get("/current-usages")
+def get_current_usages(db: Session = Depends(get_protheus_db)):
+    """Collects current usage values."""
+    return return_all(db)
 
-@router.get("/memory-usage")
-async def get_memory_usage(db: Session = Depends(get_protheus_db)):
-    """Collects Memory usage. Return usage values in real time and store hourly, daily and 
-    weekly values in the database."""
-    return real_time_memory_usage(db)
+@router.get("/last-60-minutes")
+def get_last():
+    """Returns last 60 minutes of data for CPU and Memory"""
+    total = total_data()
+    per_process_cpu = last_minutes_cpu_per_process_data()
+    per_process_mem = last_minutes_mem_per_process_data()    
+    
+    return {"total_data": total, "cpu_data": per_process_cpu, "memory_data": per_process_mem}
 
 def setup_middleware(app):
     """Sets up middleware exceptions."""

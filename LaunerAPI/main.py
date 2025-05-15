@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+import asyncio
+from app.services.tasks import collect_data
 from app.routes.setup import router, setup_middleware, setup_static_files
 from app.core.logging import setup_logging
 
@@ -14,3 +16,7 @@ app.include_router(router, prefix="/api")
 
 # Setup static files
 setup_static_files(app)
+
+@app.on_event("startup")
+async def start_collector():
+    asyncio.create_task(collect_data())
