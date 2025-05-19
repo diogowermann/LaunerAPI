@@ -10,8 +10,8 @@ from app.core.security import LoginData, authenticate_user, get_current_user
 from fastapi.middleware.cors import CORSMiddleware
 from app.services.current_usages import return_all
 from app.services.merge_total_data import return_data as total_data
-from app.services.cpu.get_per_process_usage import return_data as last_minutes_cpu_per_process_data
-from app.services.memory.get_per_process_usage import return_data as last_minutes_mem_per_process_data
+from app.services.cpu.get_per_process_usage import return_data as last_minutes_cpu_per_process_data, return_services as cpu_services_data
+from app.services.memory.get_per_process_usage import return_data as last_minutes_mem_per_process_data, return_services as mem_services_data
 import logging
 
 router = APIRouter()
@@ -51,11 +51,17 @@ def get_last():
     
     return {"total_data": total, "cpu_data": per_process_cpu, "memory_data": per_process_mem}
 
+@router.get("/last-60-minutes-services")
+def get_last():
+    cpu = cpu_services_data()
+    memory = mem_services_data()
+    return {"cpu": cpu, "memory": memory}
+
 def setup_middleware(app):
     """Sets up middleware exceptions."""
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000"],
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

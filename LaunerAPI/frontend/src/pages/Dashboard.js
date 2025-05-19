@@ -5,12 +5,14 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend,
 import { useSystemStats } from '../hooks/useSystemStats';
 import { useTotalData } from '../hooks/useLastHourData';
 import { usePerProcessData } from '../hooks/useLastHourData';
+import { useServicesData } from '../hooks/useLastHourData';
 
 const Dashboard = () => {
   const [isRealTimeOpen, setIsRealTimeOpen] = React.useState(false);
   const systemStats = useSystemStats(isRealTimeOpen);
   const { totalData } = useTotalData();
   const { cpuData, memoryData } = usePerProcessData();
+  const { servicesCpuData, servicesMemoryData } = useServicesData();
 
   React.useEffect(() => {
     const collapseElement = document.getElementById('realTimeDataCollapse');
@@ -69,6 +71,13 @@ const Dashboard = () => {
     ? Object.keys(memoryData[0]).filter(key => key !== 'time')
     : [];
 
+  const cpuServicesProcessNames = servicesCpuData.length > 0
+    ? Object.keys(servicesCpuData[0]).filter(key => key !== 'time')
+    : [];
+  
+  const memoryServicesProcessNames = servicesMemoryData.length > 0
+    ? Object.keys(servicesMemoryData[0]).filter(key => key !== 'time')
+    : [];
 
   const CustomLegend = ({payload}) => {
     return (
@@ -238,7 +247,7 @@ const Dashboard = () => {
           Registros da <strong>Memória</strong> da Última Hora
           </button>
         </div>
-        <div className='collapse' id='totalCollapse'>
+        <div className='collapse row' id='totalCollapse'>
           <div className='container text-center'>
             <h2>Registro de Uso da Última Hora</h2>
             <div style={{ width: '100%', height: 300 }}>
@@ -270,58 +279,100 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className='collapse' id='cpuCollapse'>
-          <div className='container text-center'>
-            <h2>Registro de Uso da CPU por Processo na Última Hora</h2>
-            <div style={{ width: '100%', height: 300 }}>
-              <ResponsiveContainer>
-                <LineChart data={cpuData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip />
-                  <Legend />
-                  {cpuProcessNames.map((name, idx) => (
-                    <Line
-                      key={name}
-                      type="monotone"
-                      dataKey={name}
-                      name={name}
-                      stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
-                      dot={false}
-                      activeDot={{ r: 4 }}
-                    />
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+        <div className='collapse row' id='cpuCollapse'>
+          <div className='container text-center col' style={{ height: 300 }}>
+            <h2>Registros Gerais</h2>
+            <ResponsiveContainer>
+              <LineChart data={cpuData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                <Legend />
+                {cpuProcessNames.map((name, idx) => (
+                  <Line
+                    key={name}
+                    type="monotone"
+                    dataKey={name}
+                    name={name}
+                    stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
+                    dot={false}
+                    activeDot={{ r: 4 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div className='container text-center col' style={{ height: '300px' }}>
+            <h2>Serviços do Protheus</h2>
+            <ResponsiveContainer>
+              <LineChart data={servicesCpuData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                <Legend />
+                {cpuServicesProcessNames.map((name, idx) => (
+                  <Line
+                    key={name}
+                    type="monotone"
+                    dataKey={name}
+                    name={name}
+                    stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
+                    dot={false}
+                    activeDot={{ r: 4 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
-        <div className='collapse' id='memoryCollapse'>
-          <div className='container text-center'>
-            <h2>Registro de Uso da Memória por Processo na Última Hora</h2>
-            <div style={{ width: '100%', height: 300 }}>
-              <ResponsiveContainer>
-                <LineChart data={memoryData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip />
-                  <Legend />
-                  {memoryProcessNames.map((name, idx) => (
-                    <Line
-                      key={name}
-                      type="monotone"
-                      dataKey={name}
-                      name={name}
-                      stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
-                      dot={false}
-                      activeDot={{ r: 4 }}
-                    />
-                  ))}
-                </LineChart>
+        <div className='collapse row' id='memoryCollapse'>
+          <div className='container text-center col' style={{ height: '300px' }}>
+            <h3>Registros Gerais</h3>
+            <ResponsiveContainer>
+              <LineChart data={memoryData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                <Legend />
+                {memoryProcessNames.map((name, idx) => (
+                  <Line
+                    key={name}
+                    type="monotone"
+                    dataKey={name}
+                    name={name}
+                    stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
+                    dot={false}
+                    activeDot={{ r: 4 }}
+                  />
+                ))}
+              </LineChart>
               </ResponsiveContainer>
-            </div>
+          </div>
+          <div className='container text-center col' style={{ height: '300px' }}>
+            <ResponsiveContainer>
+              <h3>Serviços do Protheus</h3>
+              <LineChart data={servicesMemoryData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                <Legend />
+                {memoryServicesProcessNames.map((name, idx) => (
+                  <Line
+                    key={name}
+                    type="monotone"
+                    dataKey={name}
+                    name={name}
+                    stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
+                    dot={false}
+                    activeDot={{ r: 4 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>

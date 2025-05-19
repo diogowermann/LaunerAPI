@@ -27,6 +27,39 @@ export const useTotalData = () => {
     };
 };
 
+export const useServicesData =() => {
+    const [servicesCpuData, setServicesCpuData] = useState([]);;
+    const [servicesMemoryData, setServicesMemoryData] = useState([]);
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await api.get('/last-60-minutes-services');
+                const cpu = response.data.cpu
+                const memory = response.data.memory
+                console.log(cpu);
+
+                const cpuServicesForChart = cpu.map(([time, obj]) => ({ time, ...obj}));
+                const memoryServicesForChart = memory.map(([time, obj]) => ({ time, ...obj}));
+                setServicesCpuData(cpuServicesForChart);
+                setServicesMemoryData(memoryServicesForChart);
+            } catch (error) {
+                console.error('Error fetching per process data:', error);
+            }
+        };
+
+        fetchData();
+        const interval = setInterval(fetchData, 60000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return {
+        servicesCpuData,
+        servicesMemoryData
+    };
+}
+
 export const usePerProcessData = () => {
     const [cpuData, setCpuData] = useState([]);
     const [memoryData, setMemoryData] = useState([]);

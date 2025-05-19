@@ -71,12 +71,12 @@ async def get_data(db):
 
     if current_day != last_day and collected:
         data = hourly_data
-        if data and await store_total_daily(db, data):
+        if data and await store_total_daily(db):
             last_day = current_day
 
     if current_week != last_week and collected:
         data = hourly_data
-        if data and await store_total_daily(db, data):
+        if data and await store_total_daily(db):
             last_week = current_week
 
 def return_data():
