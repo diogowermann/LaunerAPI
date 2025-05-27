@@ -4,6 +4,7 @@ Used for interacting with the frontend.
 """
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.staticfiles import StaticFiles
+import os
 from sqlalchemy.orm import Session
 from app.database import get_protheus_db
 from app.core.security import LoginData, authenticate_user, get_current_user
@@ -30,6 +31,7 @@ async def login(login_data: LoginData, db: Session = Depends(get_protheus_db)):
         logger.info(f"==LOGIN== {login_data.username} fez login com sucesso.")
         return user
     except Exception as e:
+        logger.debug(f"Login failed for user {login_data.username}")        
         raise HTTPException(status_code=400, detail="Credenciais Inválidas")
 
 # Example protected route, use as template for future routes
@@ -71,3 +73,14 @@ def setup_static_files(app):
     """Sets static files for the application."""
     app.mount("/static", StaticFiles(directory="frontend/src"), name="static")
     app.mount("/", StaticFiles(directory="frontend/src/pages", html=True), name="react")
+    # ------- Serve React's production build (npm run build) -------
+    # app.mount(
+    #     "/static",
+    #     StaticFiles(directory="frontend/build/static"),
+    #     name="static",
+    # )
+    # app.mount(
+    #     "/",
+    #     StaticFiles(directory="frontend/build", html=True),
+    #     name="react",
+    # )

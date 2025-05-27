@@ -204,17 +204,17 @@ async def get_data(db):
 
     if current_hour != last_hour and collected:
         p_data = [entry[1] for entry in appserver_service_hourly_data]
-        if p_data and await store_per_process_hourly(db, average(appserver_service_hourly_data)):
+        if p_data and await store_per_process_hourly(db, average(p_data)):
             last_hour = current_hour
 
     if current_day != last_day and collected:
         p_data = [entry[1] for entry in appserver_service_hourly_data]
-        if p_data and await store_per_process_daily(db, average(appserver_service_hourly_data)):
+        if p_data and await store_per_process_daily(db, average(p_data)):
             last_day = current_day
 
     if current_week != last_week and collected:
         p_data = [entry[1] for entry in appserver_service_hourly_data]
-        if p_data and await store_per_process_weekly(db, average(appserver_service_hourly_data)):
+        if p_data and await store_per_process_weekly(db, average(p_data)):
             last_week = current_week
 
 def return_data():

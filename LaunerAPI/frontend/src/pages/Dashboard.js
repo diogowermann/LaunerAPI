@@ -96,8 +96,146 @@ const Dashboard = () => {
       <div className='container' style={{ marginTop: "25px", marginBottom: "50px"}}>
         <h1>Painel</h1>
       </div>
+      
+      <div className='container mt-5'>
+        <div className='container row text-center'>
+          <button className='btn btn-primary col' type='button' data-bs-toggle='collapse' data-bs-target='#totalCollapse'  style={{ maxWidth: '28%', margin: 'auto', marginLeft: '5%' }}>
+          Registros do <strong>Total</strong> da Última Hora
+          </button>
+          <button className='btn btn-primary col' type='button' data-bs-toggle='collapse' data-bs-target='#cpuCollapse'  style={{ maxWidth: '28%', margin: 'auto' }}>
+          Registros do <strong>CPU</strong> da Última Hora
+          </button>
+          <button className='btn btn-primary col' type='button' data-bs-toggle='collapse' data-bs-target='#memoryCollapse'  style={{ maxWidth: '28%', margin: 'auto' }}>
+          Registros da <strong>Memória</strong> da Última Hora
+          </button>
+        </div>
+        <div className='collapse row mt-3' id='totalCollapse'>
+          <div className='container text-center'>
+            <h2>Registro de Uso da Última Hora</h2>
+            <div style={{ width: '100%', height: 300 }}>
+              <ResponsiveContainer>
+                <LineChart data={totalDataLastHour}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="time" />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="cpu" 
+                    name="CPU"
+                    stroke="#e35f00" 
+                    dot={false} 
+                    activeDot={{ r: 4 }} 
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="memory" 
+                    name="Memória"
+                    stroke="#2228bf" 
+                    dot={false} 
+                    activeDot={{ r: 4 }} 
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+        <div className='collapse row mt-3' id='cpuCollapse'>
+          <div className='container text-center col' style={{ height: 300 }}>
+            <h2>Registros Gerais</h2>
+            <ResponsiveContainer>
+              <LineChart data={cpuData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                {cpuProcessNames.map((name, idx) => (
+                  <Line
+                    key={name}
+                    type="monotone"
+                    dataKey={name}
+                    name={name}
+                    stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
+                    dot={false}
+                    activeDot={{ r: 4 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div className='container text-center col' style={{ height: '300px' }}>
+            <h2>Serviços do Protheus</h2>
+            <ResponsiveContainer>
+              <LineChart data={servicesCpuData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                {cpuServicesProcessNames.map((name, idx) => (
+                  <Line
+                    key={name}
+                    type="monotone"
+                    dataKey={name}
+                    name={name}
+                    stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
+                    dot={false}
+                    activeDot={{ r: 4 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        <div className='collapse row mt-3' id='memoryCollapse'>
+          <div className='container text-center col' style={{ height: '300px' }}>
+            <h3>Registros Gerais</h3>
+            <ResponsiveContainer>
+              <LineChart data={memoryData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                {memoryProcessNames.map((name, idx) => (
+                  <Line
+                    key={name}
+                    type="monotone"
+                    dataKey={name}
+                    name={name}
+                    stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
+                    dot={false}
+                    activeDot={{ r: 4 }}
+                  />
+                ))}
+              </LineChart>
+              </ResponsiveContainer>
+          </div>
+          <div className='container text-center col' style={{ height: '300px' }}>
+            <h3>Serviços do Protheus</h3>
+            <ResponsiveContainer>
+              <LineChart data={servicesMemoryData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                {memoryServicesProcessNames.map((name, idx) => (
+                  <Line
+                    key={name}
+                    type="monotone"
+                    dataKey={name}
+                    name={name}
+                    stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
+                    dot={false}
+                    activeDot={{ r: 4 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
 
-      <div className='container text-center'>
+      <div className='container text-center mt-5'>
           <button className='btn btn-info' type='button' data-bs-toggle='collapse' data-bs-target='#realTimeDataCollapse'>
             Mostrar Dados em Tempo Real
           </button>
@@ -232,147 +370,6 @@ const Dashboard = () => {
           <div className='col'>
             <h5>Última Semana</h5>
             <h3>{memLastWeek.toFixed(2)}%</h3>
-          </div>
-        </div>
-      </div>
-      <div className='container mt-5'>
-        <div className='container row text-center'>
-          <button className='btn btn-primary col' type='button' data-bs-toggle='collapse' data-bs-target='#totalCollapse'  style={{ maxWidth: '28%', margin: 'auto', marginLeft: '5%' }}>
-          Registros do <strong>Total</strong> da Última Hora
-          </button>
-          <button className='btn btn-primary col' type='button' data-bs-toggle='collapse' data-bs-target='#cpuCollapse'  style={{ maxWidth: '28%', margin: 'auto' }}>
-          Registros do <strong>CPU</strong> da Última Hora
-          </button>
-          <button className='btn btn-primary col' type='button' data-bs-toggle='collapse' data-bs-target='#memoryCollapse'  style={{ maxWidth: '28%', margin: 'auto' }}>
-          Registros da <strong>Memória</strong> da Última Hora
-          </button>
-        </div>
-        <div className='collapse row' id='totalCollapse'>
-          <div className='container text-center'>
-            <h2>Registro de Uso da Última Hora</h2>
-            <div style={{ width: '100%', height: 300 }}>
-              <ResponsiveContainer>
-                <LineChart data={totalDataLastHour}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="time" />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="cpu" 
-                    name="CPU"
-                    stroke="#e35f00" 
-                    dot={false} 
-                    activeDot={{ r: 4 }} 
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="memory" 
-                    name="Memória"
-                    stroke="#2228bf" 
-                    dot={false} 
-                    activeDot={{ r: 4 }} 
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-        <div className='collapse row' id='cpuCollapse'>
-          <div className='container text-center col' style={{ height: 300 }}>
-            <h2>Registros Gerais</h2>
-            <ResponsiveContainer>
-              <LineChart data={cpuData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Legend />
-                {cpuProcessNames.map((name, idx) => (
-                  <Line
-                    key={name}
-                    type="monotone"
-                    dataKey={name}
-                    name={name}
-                    stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
-                    dot={false}
-                    activeDot={{ r: 4 }}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <div className='container text-center col' style={{ height: '300px' }}>
-            <h2>Serviços do Protheus</h2>
-            <ResponsiveContainer>
-              <LineChart data={servicesCpuData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Legend />
-                {cpuServicesProcessNames.map((name, idx) => (
-                  <Line
-                    key={name}
-                    type="monotone"
-                    dataKey={name}
-                    name={name}
-                    stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
-                    dot={false}
-                    activeDot={{ r: 4 }}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        <div className='collapse row' id='memoryCollapse'>
-          <div className='container text-center col' style={{ height: '300px' }}>
-            <h3>Registros Gerais</h3>
-            <ResponsiveContainer>
-              <LineChart data={memoryData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Legend />
-                {memoryProcessNames.map((name, idx) => (
-                  <Line
-                    key={name}
-                    type="monotone"
-                    dataKey={name}
-                    name={name}
-                    stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
-                    dot={false}
-                    activeDot={{ r: 4 }}
-                  />
-                ))}
-              </LineChart>
-              </ResponsiveContainer>
-          </div>
-          <div className='container text-center col' style={{ height: '300px' }}>
-            <ResponsiveContainer>
-              <h3>Serviços do Protheus</h3>
-              <LineChart data={servicesMemoryData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Legend />
-                {memoryServicesProcessNames.map((name, idx) => (
-                  <Line
-                    key={name}
-                    type="monotone"
-                    dataKey={name}
-                    name={name}
-                    stroke={`hsl(${(idx * 60) % 360}, 70%, 40%)`}
-                    dot={false}
-                    activeDot={{ r: 4 }}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
           </div>
         </div>
       </div>
