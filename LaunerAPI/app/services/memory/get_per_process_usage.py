@@ -24,7 +24,7 @@ last_minute = None
 last_hour = None
 last_day = None
 last_week = None
-
+tracked_process_names = None  # Will hold the names of the first 7 processes
 per_appserver_service_minute_readings = {}
 appserver_service_hourly_data = deque(maxlen=MINUTES_IN_HOUR)
 last_service_minute = None
@@ -42,6 +42,7 @@ def average(data):
 
 # ----- Process-based usage -----
 def get_processes():
+    global tracked_process_names
     processes = []
     other_processes = 0
     protheus_services = 0
@@ -59,10 +60,17 @@ def get_processes():
             continue
 
     sorted_processes = sorted(processes, key=lambda p: p['memory_percent'], reverse=True)
-    top_processes = sorted_processes[:TOP_PROCESSES]
+    
+    if tracked_process_names is None:
+        tracked_process_names = [p['name'] for p in sorted_processes[:TOP_PROCESSES]]
 
-    for proc in sorted_processes[TOP_PROCESSES:]:
-        other_processes += proc['memory_percent']
+    top_processes = []
+
+    for proc in sorted_processes:
+        if proc['name'] in tracked_process_names:
+            top_processes.append(proc)
+        else:
+            other_processes += proc['memory_percent']
 
     if top_processes:
         top_processes.append({
